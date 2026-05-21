@@ -1,0 +1,130 @@
+{
+  "name": "06-Multi-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "21ebd569-55da-4077-84ac-68eb29f140ec",
+      "name": "When chat message received",
+      "webhookId": "a1de305e-3cac-465a-ae66-9147e47713ed"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "#Overview \nYou are an orchestrator agent. your only job is to delegate the task to the correct tool. No need to write  email or create summaries. "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3991ef0b-5b1c-4705-b2fd-07a42d61fcf1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        208
+      ],
+      "id": "216a6f32-90d2-49fd-8f70-9f4c016a5d97",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "dezg8zCipCFiVJKI",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to take any email actions",
+        "workflowId": {
+          "__rl": true,
+          "value": "c2vmqXM63Vf1Icda",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/c2vmqXM63Vf1Icda",
+          "cachedResultName": "06.1-sub agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        368,
+        208
+      ],
+      "id": "98be5d8f-301f-415c-a69a-e76a97db96ab",
+      "name": "Email-Agent"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email-Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "8d5af5c3-18f7-4238-9100-48520d000f9b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b8c28d576cc97df854beb84af3def0550abe5dd47175e93a87d8f26a07da7fd"
+  },
+  "id": "kTwqd2ISeIF2ONKa",
+  "tags": []
+}

@@ -1,0 +1,193 @@
+{
+  "name": "07-Project",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "920ecb6e-19ae-4796-82fc-0a1a2a60ef56",
+      "name": "When chat message received",
+      "webhookId": "2679bd68-f1ad-4864-a4b0-6124246fd3f7"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an orchestrator. The user will give you a topic.\nYour job is to:\n1. Extract the core topic clearly\n2. Pass it to the search agent as a clean search query\n3. Then pass search results to the summarizer\n4. Return the final summary to the user\n\nAlways respond in a structured, professional tone."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        480,
+        0
+      ],
+      "id": "706f7001-bede-4909-90c1-a4f4c48b798d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        256,
+        208
+      ],
+      "id": "7bc75207-0c13-4b88-a3bf-3be4b9be5467",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "0Z3jk3T8Xqjun67g",
+          "name": "gahriday"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        320,
+        656
+      ],
+      "id": "93e6eca7-867a-429b-ac67-faa97205d84c",
+      "name": "Search in Tavily",
+      "credentials": {
+        "tavilyApi": {
+          "id": "i60ccw3oiRu5H0ZH",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "You are a research agent. Given a topic or query, use the web search tool\nto find 3-5 relevant, recent articles or sources. Return the raw findings\nincluding titles, snippets, and URLs. Do not summarize yet.",
+        "workflowId": {
+          "__rl": true,
+          "value": "YMln1iIkYwudOEQJ",
+          "mode": "list",
+          "cachedResultName": "My Sub-Workflow 1",
+          "cachedResultUrl": "/workflow/YMln1iIkYwudOEQJ"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        208
+      ],
+      "id": "2041aa29-d153-45de-b81d-c6e4ee411cda",
+      "name": "sub agent 1"
+    },
+    {
+      "parameters": {
+        "description": "You are a summarization expert. You will receive raw research findings.\nYour job is to:\n- Write a clear, concise summary (200-300 words)\n- Highlight the 3 most important points as bullet points\n- Mention sources at the end\n- Use simple language, avoid jargon",
+        "workflowId": {
+          "__rl": true,
+          "value": "j5Jp48xU5k3PAvzl",
+          "mode": "list",
+          "cachedResultName": "My Sub-Workflow 2",
+          "cachedResultUrl": "/workflow/j5Jp48xU5k3PAvzl"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        208
+      ],
+      "id": "16feb1cf-6f8b-4aad-89e2-38123b453b05",
+      "name": "sub agent 2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search in Tavily": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "sub agent 1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sub agent 2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4a216827-7263-41f7-80e6-e3a3643daa2e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b8c28d576cc97df854beb84af3def0550abe5dd47175e93a87d8f26a07da7fd"
+  },
+  "id": "vRNqIhC5miDkg4Fu",
+  "tags": []
+}
